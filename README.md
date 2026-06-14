@@ -4,6 +4,16 @@ A Lakebed capsule for dropping HTML documents onto the web via one simple API ca
 
 Use it for AI-written plans, research notes, and other information-only HTML documents that should be easy for an agent to create and share publicly by URL.
 
+## Public URL
+
+HTML Drop is available at:
+
+```txt
+https://html-drop.lakebed.app/
+```
+
+Use this as the base URL for the hosted API and generated document links.
+
 ## Recommended agent API
 
 Publishing is API-only and requires `PUBLISH_TOKEN` from `.env.lakebed.server`.
@@ -11,7 +21,7 @@ Publishing is API-only and requires `PUBLISH_TOKEN` from `.env.lakebed.server`.
 Publish:
 
 ```sh
-curl -X POST http://localhost:3000/api/publish \
+curl -X POST https://html-drop.lakebed.app/api/publish \
   -H 'content-type: application/json' \
   -H 'authorization: Bearer <PUBLISH_TOKEN>' \
   -d '{
@@ -24,10 +34,10 @@ Response:
 
 ```json
 {
-  "url": "http://localhost:3000/p/<slug>",
-  "rawUrl": "http://localhost:3000/raw?slug=<slug>",
+  "url": "https://html-drop.lakebed.app/p/<slug>",
+  "rawUrl": "https://html-drop.lakebed.app/raw?slug=<slug>",
   "editToken": "<token-if-editable>",
-  "editUrl": "http://localhost:3000/api/edit"
+  "editUrl": "https://html-drop.lakebed.app/api/edit"
 }
 ```
 
@@ -48,7 +58,7 @@ Optional fields:
 ## Edit an editable document
 
 ```sh
-curl -X POST http://localhost:3000/api/edit \
+curl -X POST https://html-drop.lakebed.app/api/edit \
   -H 'content-type: application/json' \
   -d '{
     "editToken": "<token>",
@@ -95,6 +105,8 @@ If `PUBLISH_TOKEN` is missing, publish requests fail with a server configuration
 The homepage is intentionally minimal and does not create pages. Publishing happens only through the token-protected API. Public API documentation lives here in the README, not in the web UI.
 
 ## Run locally
+
+For local development, use `http://localhost:3000` instead of the hosted base URL in API examples.
 
 ```sh
 npx lakebed dev
