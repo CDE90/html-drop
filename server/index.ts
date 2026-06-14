@@ -314,7 +314,7 @@ export default capsule({
         return text("not found", { status: 404 });
       }
 
-      return new Response(row.tailwind !== false ? withTailwind(row.html) : row.html, {
+      return text(row.tailwind !== false ? withTailwind(row.html) : row.html, {
         status: 200,
         headers: {
           "content-type": "text/html; charset=utf-8",
