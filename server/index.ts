@@ -57,8 +57,10 @@ function withTailwind(html: string): string {
   }
 
   const script = '<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>';
-  if (html.toLowerCase().includes("</head>")) {
-    return html.replace(/<\/head>/i, `${script}</head>`);
+  const lower = html.toLowerCase();
+  const headEnd = lower.indexOf("</head>");
+  if (headEnd >= 0) {
+    return `${html.slice(0, headEnd)}${script}${html.slice(headEnd)}`;
   }
   return `${script}${html}`;
 }
