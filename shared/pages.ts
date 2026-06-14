@@ -7,6 +7,7 @@ export type Page = {
   authorId: string;
   readOnly: boolean;
   expiresAt: string;
+  tailwind: boolean;
   createdAt: string;
   updatedAt: string;
 };

@@ -51,6 +51,18 @@ function isExpired(row: { expiresAt: string }): boolean {
   return Boolean(row.expiresAt) && Date.now() > Date.parse(row.expiresAt);
 }
 
+function withTailwind(html: string): string {
+  if (html.includes("@tailwindcss/browser")) {
+    return html;
+  }
+
+  const script = '<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>';
+  if (html.toLowerCase().includes("</head>")) {
+    return html.replace(/<\/head>/i, `${script}</head>`);
+  }
+  return `${script}${html}`;
+}
+
 function validateHtml(html: string) {
   if (!html) {
     return "html is required";
@@ -69,6 +81,7 @@ type CreateBody = {
   title?: string;
   readOnly?: boolean;
   expiresInDays?: number | string;
+  tailwind?: boolean;
 };
 
 type EditBody = {
@@ -86,7 +99,8 @@ export default capsule({
       html: string(),
       authorId: string(),
       readOnly: boolean().default(false),
-      expiresAt: string().default("")
+      expiresAt: string().default(""),
+      tailwind: boolean().default(true)
     })
   },
 
@@ -127,7 +141,8 @@ export default capsule({
         html,
         authorId: ctx.auth.userId,
         readOnly: Boolean(body.readOnly),
-        expiresAt: expiresAtFor(body.expiresInDays)
+        expiresAt: expiresAtFor(body.expiresInDays),
+        tailwind: body.tailwind !== false
       });
 
       const origin = originFor(req);
@@ -144,7 +159,8 @@ export default capsule({
         editToken: row.readOnly ? "" : row.editToken,
         editUrl: `${origin}/api/edit`,
         readOnly: row.readOnly,
-        expiresAt: row.expiresAt
+        expiresAt: row.expiresAt,
+        tailwind: row.tailwind
       });
     }),
 
@@ -184,7 +200,8 @@ export default capsule({
         html,
         authorId: ctx.auth.userId,
         readOnly: Boolean(body.readOnly),
-        expiresAt: expiresAtFor(body.expiresInDays)
+        expiresAt: expiresAtFor(body.expiresInDays),
+        tailwind: body.tailwind !== false
       });
 
       const origin = originFor(req);
@@ -201,7 +218,8 @@ export default capsule({
         editToken: row.readOnly ? "" : row.editToken,
         editUrl: `${origin}/api/edit`,
         readOnly: row.readOnly,
-        expiresAt: row.expiresAt
+        expiresAt: row.expiresAt,
+        tailwind: row.tailwind
       });
     }),
 
@@ -294,7 +312,7 @@ export default capsule({
         return text("not found", { status: 404 });
       }
 
-      return new Response(row.html, {
+      return new Response(row.tailwind !== false ? withTailwind(row.html) : row.html, {
         status: 200,
         headers: {
           "content-type": "text/html; charset=utf-8",

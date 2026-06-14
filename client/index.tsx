@@ -22,7 +22,7 @@ function Home() {
 function PageView() {
   document.title = "HTML Drop Document";
   const { slug } = useParams<{ slug: string }>();
-  return <iframe className="h-screen w-screen border-0 bg-white" sandbox="allow-same-origin allow-popups allow-forms" src={`/raw?slug=${encodeURIComponent(slug)}`} title="Published document" />;
+  return <iframe className="h-screen w-screen border-0 bg-white" sandbox="allow-scripts allow-popups allow-forms" src={`/raw?slug=${encodeURIComponent(slug)}`} title="Published document" />;
 }
 
 export function App() {

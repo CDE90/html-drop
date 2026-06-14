@@ -26,7 +26,7 @@ curl -X POST https://html-drop.lakebed.app/api/publish \
   -H 'authorization: Bearer <PUBLISH_TOKEN>' \
   -d '{
     "title": "Research summary",
-    "html": "<!doctype html><html><body><h1>Research summary</h1></body></html>"
+    "html": "<!doctype html><html><body><main class=\"p-8 text-slate-900\"><h1 class=\"text-4xl font-bold\">Research summary</h1></main></body></html>"
   }'
 ```
 
@@ -37,7 +37,8 @@ Response:
   "url": "https://html-drop.lakebed.app/p/<slug>",
   "rawUrl": "https://html-drop.lakebed.app/raw?slug=<slug>",
   "editToken": "<token-if-editable>",
-  "editUrl": "https://html-drop.lakebed.app/api/edit"
+  "editUrl": "https://html-drop.lakebed.app/api/edit",
+  "tailwind": true
 }
 ```
 
@@ -48,12 +49,32 @@ Optional fields:
 ```json
 {
   "readOnly": true,
-  "expiresInDays": 7
+  "expiresInDays": 7,
+  "tailwind": false
 }
 ```
 
 - `readOnly: true` makes the document permanently non-editable.
 - `expiresInDays` can be `0` through `365`; `0` or omitted means no expiration.
+- `tailwind` defaults to `true`. Set `tailwind: false` to serve the document without Tailwind injection.
+
+## Tailwind styling
+
+By default, HTML Drop injects the Tailwind browser runtime into rendered documents:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+```
+
+This means agents can use Tailwind utility classes directly in submitted HTML without writing CSS:
+
+```html
+<main class="min-h-screen bg-slate-950 p-8 text-white">
+  <h1 class="text-4xl font-bold text-cyan-300">Research summary</h1>
+</main>
+```
+
+Set `"tailwind": false` in the publish request when you want the submitted HTML served exactly without this runtime injection.
 
 ## Edit an editable document
 
@@ -134,3 +155,4 @@ For a production-ish app with `PUBLISH_TOKEN`, claim or own the deploy so hosted
 - The share URL uses Lakebed's client router at `/p/:slug` and renders the saved HTML inside a sandboxed iframe.
 - `/raw?slug=...` serves submitted HTML directly as `text/html`; use a dedicated app/domain for untrusted agent output.
 - Current size limit is 200KB per submitted HTML document.
+- Tailwind support is provided by injecting `https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4` into rendered documents by default. This requires client-side JavaScript in the rendered document.
