@@ -1,4 +1,5 @@
 import { Route, Router, Routes, useParams } from "lakebed/client";
+import { useEffect, useState } from "preact/hooks";
 
 function Home() {
   document.title = "HTML Drop";
@@ -22,7 +23,41 @@ function Home() {
 function PageView() {
   document.title = "HTML Drop Document";
   const { slug } = useParams<{ slug: string }>();
-  return <iframe className="h-screen w-screen border-0 bg-white" sandbox="allow-scripts allow-popups allow-forms" src={`/raw?slug=${encodeURIComponent(slug)}`} title="Published document" />;
+  const [html, setHtml] = useState("");
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/raw?slug=${encodeURIComponent(slug)}`)
+      .then(async (response) => {
+        if (!response.ok) {
+          if (!cancelled) {
+            setNotFound(true);
+          }
+          return "";
+        }
+        return response.text();
+      })
+      .then((body) => {
+        if (!cancelled) {
+          setHtml(body);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setNotFound(true);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  if (notFound) {
+    return <main className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-100">Document not found</main>;
+  }
+
+  return <iframe className="h-screen w-screen border-0 bg-white" sandbox="allow-scripts allow-popups allow-forms" srcDoc={html} title="Published document" />;
 }
 
 export function App() {
